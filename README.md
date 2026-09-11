@@ -4,16 +4,17 @@ A cozy, magical interactive visual art experience featuring continuous Diamond P
 
 ## 🚀 GitHub Pages Setup
 
-The repository is pre-bundled and configured to work from either `/ (root)` or `/docs`:
-- **Root**: `index.html`, `404.html`, `assets/app.js`, `assets/app.css`
-- **Docs**: `docs/index.html`, `docs/404.html`, `docs/assets/app.js`, `docs/assets/app.css`
+The project is built entirely as pure HTML, CSS, and JS files located right at the root:
+- `index.html`
+- `style.css`
+- `app.js`
 
-### Setup Instructions
+### Instant Deployment:
 1. Export or push this repository to GitHub.
-2. Go to your repository on GitHub: **Settings** > **Pages** (in the left sidebar).
-3. Under **Build and deployment** > **Source**, choose **Deploy from a branch**.
-4. Set branch to **main** (or **master**) and folder to either **/ (root)** or **/docs**.
+2. Go to **Settings** > **Pages** in your repository.
+3. Under **Build and deployment** > **Source**, select **Deploy from a branch**.
+4. Set branch to **main** (or **master**) and folder to **/ (root)**.
 5. Click **Save**.
 
-> ⚠️ **Important URL Casing**: GitHub Pages URLs are case-sensitive. The repository name is uppercase `ASMR`, so make sure the URL in your browser is:  
-> `https://destiniedesigns.github.io/ASMR/` (all uppercase **ASMR**, not lowercase `asmr`).
+Your app runs at: `https://destiniedesigns.github.io/ASMR/`!
+*(Remember: GitHub URLs are case-sensitive, so use uppercase `ASMR`)*

@@ -14,11 +14,11 @@ export default defineConfig(({command}) => {
           handler(html) {
             return html
               .replace(
-                /<link rel="stylesheet" crossorigin href="\.\/assets\/app\.css">/g,
+                /<link rel="stylesheet"[^>]*href=["']\.\/style\.css["'][^>]*>/g,
                 ''
               )
               .replace(
-                /<script type="module" crossorigin src="\.\/assets\/app\.js"><\/script>/g,
+                /<script[^>]*src=["']\.\/app\.js["'][^>]*><\/script>/g,
                 '<script type="module" src="/src/main.tsx"></script>'
               );
           },
@@ -35,9 +35,9 @@ export default defineConfig(({command}) => {
     build: {
       rollupOptions: {
         output: {
-          entryFileNames: 'assets/app.js',
-          chunkFileNames: 'assets/[name].js',
-          assetFileNames: 'assets/app.[ext]',
+          entryFileNames: 'app.js',
+          chunkFileNames: '[name].js',
+          assetFileNames: 'style.[ext]',
         },
       },
     },
