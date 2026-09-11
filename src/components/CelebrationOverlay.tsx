@@ -11,6 +11,7 @@ interface Props {
   mode: ArtMode;
   artwork: Artwork;
   holdSeconds: number;
+  autoCycle?: boolean;
   onNextArtwork: () => void;
 }
 
@@ -18,12 +19,15 @@ export const CelebrationOverlay: React.FC<Props> = ({
   mode,
   artwork,
   holdSeconds,
+  autoCycle = true,
   onNextArtwork,
 }) => {
   const [secondsRemaining, setSecondsRemaining] = useState(holdSeconds);
 
   useEffect(() => {
     setSecondsRemaining(holdSeconds);
+    if (!autoCycle) return;
+
     const interval = setInterval(() => {
       setSecondsRemaining((prev) => {
         if (prev <= 1) {
@@ -36,7 +40,7 @@ export const CelebrationOverlay: React.FC<Props> = ({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [holdSeconds, onNextArtwork]);
+  }, [holdSeconds, autoCycle, onNextArtwork]);
 
   const title = mode === 'bubble' ? '🎉 POP MASTERPIECE COMPLETE 🎉' : '✨ MASTERPIECE COMPLETE ✨';
 
@@ -53,11 +57,25 @@ export const CelebrationOverlay: React.FC<Props> = ({
 
       {/* Bottom status & countdown pill */}
       <div className="mb-4 flex items-center gap-4 pointer-events-auto">
-        <div className="px-6 py-2.5 rounded-full bg-black/60 backdrop-blur-md border border-purple-500/30 text-sm md:text-base text-purple-200/90 shadow-lg flex items-center gap-3">
+        <div className="px-6 py-2.5 rounded-full bg-black/70 backdrop-blur-md border border-purple-500/30 text-sm md:text-base text-purple-200/90 shadow-lg flex items-center gap-3">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span>Admiring <strong className="text-white font-semibold">{artwork.name}</strong></span>
-          <span className="text-purple-400">•</span>
-          <span className="text-pink-300">Next artwork in <strong className="font-bold text-white">{secondsRemaining}s</strong></span>
+          <span>
+            {artwork.number ? <strong className="text-pink-300 mr-1.5 font-mono">#{artwork.number}</strong> : null}
+            Admiring <strong className="text-white font-semibold">{artwork.name}</strong>
+          </span>
+          {autoCycle ? (
+            <>
+              <span className="text-purple-400">•</span>
+              <span className="text-pink-300">
+                Auto-playing next design in <strong className="font-bold text-white">{secondsRemaining}s</strong>
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="text-purple-400">•</span>
+              <span className="text-amber-200">Auto-cycle paused</span>
+            </>
+          )}
         </div>
 
         {/* Skip wait button */}

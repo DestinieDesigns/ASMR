@@ -29,7 +29,7 @@ export default function App() {
   const [config, setConfig] = useState<StudioConfig>({
     activeMode: 'diamond',
     autoCycle: true,
-    masterpieceHoldSeconds: 60,
+    masterpieceHoldSeconds: 8, // 8 seconds of sparkling fanfare before auto-advancing
     speed: 'normal',
     soundEnabled: true,
     soundVolume: 0.5,
@@ -112,6 +112,35 @@ export default function App() {
     });
   }, [getNextIndex]);
 
+  // Go to previous artwork
+  const handlePrevArtwork = useCallback(() => {
+    setIsCelebrating(false);
+    setProgress({
+      placedCount: 0,
+      totalCount: 1,
+      percentage: 0,
+      isCompleted: false,
+    });
+
+    setArtworks((currentList) => {
+      if (currentList.length <= 1) return currentList;
+      setCurrentArtworkIndex((prevIndex) => (prevIndex - 1 + currentList.length) % currentList.length);
+      return currentList;
+    });
+  }, []);
+
+  // Jump directly to specific artwork by index
+  const handleSelectArtworkIndex = useCallback((index: number) => {
+    setIsCelebrating(false);
+    setProgress({
+      placedCount: 0,
+      totalCount: 1,
+      percentage: 0,
+      isCompleted: false,
+    });
+    setCurrentArtworkIndex(index);
+  }, []);
+
   // Shuffle to random artwork avoiding same category
   const handleShuffleArtwork = useCallback(() => {
     setIsCelebrating(false);
@@ -168,6 +197,20 @@ export default function App() {
         }
       } else if (e.key === 'n' || e.key === 'N') {
         handleNextArtwork();
+      } else if (e.key === 'p' || e.key === 'P') {
+        handlePrevArtwork();
+      } else if (e.key === 'r' || e.key === 'R') {
+        handleShuffleArtwork();
+      } else if (e.key === 'c' || e.key === 'C') {
+        setConfig((cfg) => ({ ...cfg, autoCycle: !cfg.autoCycle }));
+      } else if (e.key === '1') {
+        setConfig((cfg) => ({ ...cfg, speed: 'sleep' }));
+      } else if (e.key === '2') {
+        setConfig((cfg) => ({ ...cfg, speed: 'normal' }));
+      } else if (e.key === '3') {
+        setConfig((cfg) => ({ ...cfg, speed: 'fast' }));
+      } else if (e.key === '4') {
+        setConfig((cfg) => ({ ...cfg, speed: 'turbo' }));
       } else if (e.key === 'Escape') {
         setIsAdminOpen(false);
       }
@@ -175,7 +218,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [config.activeMode, handleTriggerShake, handleNextArtwork]);
+  }, [config.activeMode, handleTriggerShake, handleNextArtwork, handlePrevArtwork, handleShuffleArtwork]);
 
   return (
     <div
@@ -233,6 +276,7 @@ export default function App() {
               mode={config.activeMode}
               artwork={currentArtwork}
               holdSeconds={config.masterpieceHoldSeconds}
+              autoCycle={config.autoCycle}
               onNextArtwork={handleNextArtwork}
             />
           )}
@@ -241,6 +285,19 @@ export default function App() {
           <ViewerOverlay
             mode={config.activeMode}
             artwork={currentArtwork}
+            currentArtworkIndex={currentArtworkIndex}
+            totalArtworksCount={artworks.length}
+            artworks={artworks}
+            speed={config.speed}
+            autoCycle={config.autoCycle}
+            isPaused={isPaused}
+            onTogglePause={() => setIsPaused((p) => !p)}
+            onToggleAutoCycle={() => setConfig((cfg) => ({ ...cfg, autoCycle: !cfg.autoCycle }))}
+            onNextArtwork={handleNextArtwork}
+            onPrevArtwork={handlePrevArtwork}
+            onShuffleArtwork={handleShuffleArtwork}
+            onChangeSpeed={(spd) => setConfig((cfg) => ({ ...cfg, speed: spd }))}
+            onSelectArtworkIndex={handleSelectArtworkIndex}
             progress={progress}
             onOpenAdmin={() => setIsAdminOpen(true)}
             onTriggerShake={config.activeMode === 'sand' ? handleTriggerShake : undefined}
@@ -263,6 +320,7 @@ export default function App() {
           if (idx !== -1) setCurrentArtworkIndex(idx);
         }}
         onRestartArtwork={handleRestartArtwork}
+        onPrevArtwork={handlePrevArtwork}
         onNextArtwork={handleNextArtwork}
         onShuffleArtwork={handleShuffleArtwork}
         isPaused={isPaused}

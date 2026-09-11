@@ -14,6 +14,7 @@ import {
   Pause,
   RotateCcw,
   SkipForward,
+  SkipBack,
   Shuffle,
   Volume2,
   Sparkles,
@@ -33,6 +34,7 @@ interface Props {
   currentArtwork: Artwork;
   onSelectArtwork: (artwork: Artwork) => void;
   onRestartArtwork: () => void;
+  onPrevArtwork?: () => void;
   onNextArtwork: () => void;
   onShuffleArtwork: () => void;
   isPaused: boolean;
@@ -49,6 +51,7 @@ export const StreamerAdminDrawer: React.FC<Props> = ({
   currentArtwork,
   onSelectArtwork,
   onRestartArtwork,
+  onPrevArtwork,
   onNextArtwork,
   onShuffleArtwork,
   isPaused,
@@ -150,44 +153,71 @@ export const StreamerAdminDrawer: React.FC<Props> = ({
 
         {/* Section 2: Playback Controls */}
         <div className="flex flex-col gap-2.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-purple-300/80">
-            Playback Controls
-          </label>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold uppercase tracking-wider text-purple-300/80">
+              Playback & Auto-Play
+            </label>
+            <button
+              onClick={() => onUpdateConfig({ autoCycle: !config.autoCycle })}
+              className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border transition-all cursor-pointer flex items-center gap-1.5 ${
+                config.autoCycle
+                  ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200'
+                  : 'bg-amber-500/20 border-amber-400 text-amber-200'
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${config.autoCycle ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+              <span>Auto-Play: {config.autoCycle ? 'ON (Cycles 100)' : 'OFF'}</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-5 gap-1.5">
+            {onPrevArtwork && (
+              <button
+                onClick={onPrevArtwork}
+                className="p-2 rounded-xl bg-purple-950/40 hover:bg-purple-900/40 border border-purple-700/40 text-purple-200 flex flex-col items-center gap-1 transition-all cursor-pointer"
+                title="Previous Artwork (P)"
+              >
+                <SkipBack className="w-4 h-4" />
+                <span className="text-[10px] font-medium">Prev</span>
+              </button>
+            )}
+
             <button
               onClick={onTogglePause}
-              className={`p-2.5 rounded-xl border flex flex-col items-center gap-1 transition-all cursor-pointer ${
+              className={`p-2 rounded-xl border flex flex-col items-center gap-1 transition-all cursor-pointer ${
                 isPaused
                   ? 'bg-emerald-600/30 border-emerald-400 text-emerald-200'
                   : 'bg-purple-950/40 border-purple-700/40 text-purple-200 hover:bg-purple-900/40'
               }`}
             >
               {isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
-              <span className="text-[11px] font-medium">{isPaused ? 'Resume' : 'Pause'}</span>
+              <span className="text-[10px] font-medium">{isPaused ? 'Resume' : 'Pause'}</span>
             </button>
 
             <button
               onClick={onRestartArtwork}
-              className="p-2.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/40 border border-purple-700/40 text-purple-200 flex flex-col items-center gap-1 transition-all cursor-pointer"
+              className="p-2 rounded-xl bg-purple-950/40 hover:bg-purple-900/40 border border-purple-700/40 text-purple-200 flex flex-col items-center gap-1 transition-all cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
-              <span className="text-[11px] font-medium">Restart</span>
+              <span className="text-[10px] font-medium">Restart</span>
             </button>
 
             <button
               onClick={onNextArtwork}
-              className="p-2.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/40 border border-purple-700/40 text-purple-200 flex flex-col items-center gap-1 transition-all cursor-pointer"
+              className="p-2 rounded-xl bg-purple-950/40 hover:bg-purple-900/40 border border-purple-700/40 text-purple-200 flex flex-col items-center gap-1 transition-all cursor-pointer"
+              title="Next Artwork (N)"
             >
               <SkipForward className="w-4 h-4" />
-              <span className="text-[11px] font-medium">Next Art</span>
+              <span className="text-[10px] font-medium">Next</span>
             </button>
 
             <button
               onClick={onShuffleArtwork}
-              className="p-2.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/40 border border-purple-700/40 text-purple-200 flex flex-col items-center gap-1 transition-all cursor-pointer"
+              className="p-2 rounded-xl bg-purple-950/40 hover:bg-purple-900/40 border border-purple-700/40 text-purple-200 flex flex-col items-center gap-1 transition-all cursor-pointer"
+              title="Shuffle Artwork (R)"
             >
               <Shuffle className="w-4 h-4" />
-              <span className="text-[11px] font-medium">Shuffle</span>
+              <span className="text-[10px] font-medium">Shuffle</span>
             </button>
           </div>
         </div>
@@ -403,23 +433,40 @@ export const StreamerAdminDrawer: React.FC<Props> = ({
           </label>
 
           {/* Masterpiece hold duration slider */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between text-xs">
               <span className="text-purple-300 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-pink-300" />
-                Completed Artwork Display:
+                Completed Artwork Celebration Hold:
               </span>
-              <span className="font-bold text-white">{config.masterpieceHoldSeconds} seconds</span>
+              <span className="font-bold text-white">{config.masterpieceHoldSeconds}s</span>
             </div>
             <input
               type="range"
-              min="5"
+              min="3"
               max="120"
-              step="5"
+              step="1"
               value={config.masterpieceHoldSeconds}
               onChange={(e) => onUpdateConfig({ masterpieceHoldSeconds: Number(e.target.value) })}
               className="w-full accent-pink-500 cursor-pointer"
             />
+            {/* Quick hold presets */}
+            <div className="flex items-center gap-1.5 pt-0.5">
+              <span className="text-[10px] text-purple-400">Auto-Play presets:</span>
+              {[5, 8, 15, 30, 60].map((sec) => (
+                <button
+                  key={sec}
+                  onClick={() => onUpdateConfig({ masterpieceHoldSeconds: sec })}
+                  className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all cursor-pointer ${
+                    config.masterpieceHoldSeconds === sec
+                      ? 'bg-pink-600 text-white'
+                      : 'bg-purple-950/60 text-purple-300 hover:bg-purple-900/60'
+                  }`}
+                >
+                  {sec}s
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Audio Volume Slider */}
