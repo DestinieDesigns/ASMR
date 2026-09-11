@@ -16,6 +16,20 @@
   <body class="bg-[#0e0c1a] text-purple-100 overflow-hidden select-none font-['Quicksand',sans-serif]">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Smart GitHub Pages Fallback:
+      // If GitHub Pages is serving raw repository files instead of a build artifact,
+      // seamlessly redirect to the pre-compiled /docs/ bundle.
+      (function() {
+        if (window.location.hostname.indexOf('github.io') !== -1 && window.location.pathname.indexOf('/docs') === -1) {
+          var hasRawTsx = document.querySelector('script[src*="/src/main.tsx"]');
+          if (hasRawTsx) {
+            var cleanBase = window.location.pathname.replace(/\/+$/, '');
+            window.location.replace(cleanBase + '/docs/' + window.location.search + window.location.hash);
+          }
+        }
+      })();
+    </script>
   </body>
 </html>
 
