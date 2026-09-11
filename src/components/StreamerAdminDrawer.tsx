@@ -24,6 +24,8 @@ import {
   Heart,
   Gift,
   HelpCircle,
+  Music,
+  Disc,
 } from 'lucide-react';
 
 interface Props {
@@ -535,6 +537,101 @@ export const StreamerAdminDrawer: React.FC<Props> = ({
             >
               {config.smartRandomCategory ? 'ON' : 'OFF'}
             </button>
+          </div>
+
+          {/* Lo-Fi Ambient Music Playlist */}
+          <div className="flex flex-col gap-2.5 p-3 rounded-xl bg-purple-950/40 border border-purple-800/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className={`p-1.5 rounded-lg bg-pink-500/20 text-pink-300 ${soundEngine.getIsMusicPlaying() ? 'animate-spin' : ''}`} style={{ animationDuration: '6s' }}>
+                  <Disc className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-white flex items-center gap-1">
+                    Lo-Fi / Ambient Radio Playlist
+                  </span>
+                  <span className="text-[10px] text-purple-300/60">
+                    Cycles continuously through relaxing tracks
+                  </span>
+                </div>
+              </div>
+              <button
+                id="admin-lofi-toggle-btn"
+                onClick={() => {
+                  soundEngine.unlock();
+                  const nextState = soundEngine.toggleMusicPlaylist();
+                  onUpdateConfig({ lofiMusicEnabled: nextState });
+                }}
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  soundEngine.getIsMusicPlaying()
+                    ? 'bg-pink-500/30 border border-pink-400 text-pink-200 shadow-sm shadow-pink-500/30'
+                    : 'bg-purple-900/40 border border-purple-700/40 text-purple-400'
+                }`}
+              >
+                {soundEngine.getIsMusicPlaying() ? 'PLAYING' : 'OFF'}
+              </button>
+            </div>
+
+            {/* Track selector dropdown & Quick Skip */}
+            <div className="flex items-center gap-2 pt-1">
+              <select
+                id="admin-lofi-track-select"
+                value={soundEngine.getCurrentTrackIndex()}
+                onChange={(e) => {
+                  const idx = parseInt(e.target.value, 10);
+                  soundEngine.unlock();
+                  soundEngine.selectTrack(idx);
+                  if (!soundEngine.getIsMusicPlaying()) {
+                    soundEngine.startMusicPlaylist(idx);
+                    onUpdateConfig({ lofiMusicEnabled: true, lofiTrackIndex: idx });
+                  } else {
+                    onUpdateConfig({ lofiTrackIndex: idx });
+                  }
+                }}
+                className="flex-1 bg-purple-900/40 border border-purple-700/50 rounded-lg px-2.5 py-1 text-xs text-purple-200 focus:outline-none focus:border-pink-400 cursor-pointer"
+              >
+                {soundEngine.getTracks().map((track, i) => (
+                  <option key={track.id} value={i} className="bg-purple-950 text-white">
+                    {i + 1}. {track.title} ({track.bpm} BPM • {track.genre})
+                  </option>
+                ))}
+              </select>
+
+              <button
+                id="admin-lofi-skip-btn"
+                onClick={() => {
+                  soundEngine.unlock();
+                  soundEngine.nextTrack();
+                  onUpdateConfig({ lofiTrackIndex: soundEngine.getCurrentTrackIndex() });
+                }}
+                className="px-2.5 py-1 rounded-lg bg-purple-900/40 hover:bg-purple-800/60 border border-purple-700/40 text-purple-300 text-xs font-medium cursor-pointer transition-all shrink-0"
+                title="Skip to next track in playlist"
+              >
+                Next ❯
+              </button>
+            </div>
+
+            {/* Music Volume */}
+            <div className="flex items-center justify-between text-xs pt-1">
+              <span className="text-[11px] text-purple-300/70 flex items-center gap-1">
+                <Volume2 className="w-3.5 h-3.5 text-pink-300" />
+                Music Volume
+              </span>
+              <input
+                id="admin-lofi-volume-slider"
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={config.lofiMusicVolume ?? 0.35}
+                onChange={(e) => {
+                  const vol = parseFloat(e.target.value);
+                  soundEngine.setMusicVolume(vol);
+                  onUpdateConfig({ lofiMusicVolume: vol });
+                }}
+                className="w-32 accent-pink-400 h-1 bg-purple-900 rounded-lg cursor-pointer"
+              />
+            </div>
           </div>
 
           {/* Ambient Drone Pad Toggle */}

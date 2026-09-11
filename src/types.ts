@@ -69,6 +69,17 @@ export interface FloatingParticle {
   maxLife: number;
 }
 
+export interface LofiTrack {
+  id: string;
+  title: string;
+  artist: string;
+  genre: string;
+  bpm: number;
+  mood: string;
+  description: string;
+  hasBeats: boolean;
+}
+
 export interface StudioConfig {
   activeMode: ArtMode;
   autoCycle: boolean;
@@ -77,6 +88,9 @@ export interface StudioConfig {
   soundEnabled: boolean;
   soundVolume: number;
   asmrAmbientEnabled: boolean;
+  lofiMusicEnabled: boolean;
+  lofiMusicVolume: number;
+  lofiTrackIndex: number;
   streamModeOnly: boolean; // Hide all admin hints for OBS Browser source
   gridResolution: 'low' | 'medium' | 'high'; // e.g. 64x36, 96x54, 128x72
   mysteryMode: boolean; // Enables "❓ MYSTERY DREAM ❓" and 25%/50%/75% clues

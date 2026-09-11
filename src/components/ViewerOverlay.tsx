@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { soundEngine } from '../services/audioEngine';
 import { artworkCategoriesList } from '../services/artworkData';
+import { LofiMusicPlayer } from './LofiMusicPlayer';
 
 interface Props {
   mode: ArtMode;
@@ -193,6 +194,13 @@ export const ViewerOverlay: React.FC<Props> = ({
 
         {/* Current Mode & Masterpiece Title Pill */}
         <div className="flex flex-col md:flex-row items-end md:items-center gap-2.5">
+          {/* Lo-Fi / Ambient Music Player */}
+          {!streamModeOnly && (
+            <div className="pointer-events-auto">
+              <LofiMusicPlayer isCompact={true} />
+            </div>
+          )}
+
           {/* Mystery Mode Clue Banner */}
           {(mysteryMode || artwork.isMystery) && (
             <div className="animate-fade-in">
