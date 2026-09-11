@@ -3,13 +3,42 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+export default defineConfig(({command}) => {
   return {
     base: './',
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      {
+        name: 'html-dev-transform',
+        transformIndexHtml: {
+          order: 'pre',
+          handler(html) {
+            return html
+              .replace(
+                /<link rel="stylesheet" crossorigin href="\.\/assets\/app\.css">/g,
+                ''
+              )
+              .replace(
+                /<script type="module" crossorigin src="\.\/assets\/app\.js"><\/script>/g,
+                '<script type="module" src="/src/main.tsx"></script>'
+              );
+          },
+        },
+      },
+      react(),
+      tailwindcss(),
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
+      },
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          entryFileNames: 'assets/app.js',
+          chunkFileNames: 'assets/[name].js',
+          assetFileNames: 'assets/app.[ext]',
+        },
       },
     },
     server: {
