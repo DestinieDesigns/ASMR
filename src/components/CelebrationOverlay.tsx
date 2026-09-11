@@ -26,21 +26,22 @@ export const CelebrationOverlay: React.FC<Props> = ({
 
   useEffect(() => {
     setSecondsRemaining(holdSeconds);
+  }, [holdSeconds]);
+
+  useEffect(() => {
     if (!autoCycle) return;
 
-    const interval = setInterval(() => {
-      setSecondsRemaining((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          onNextArtwork();
-          return 0;
-        }
-        return prev - 1;
-      });
+    if (secondsRemaining <= 0) {
+      onNextArtwork();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setSecondsRemaining((prev) => Math.max(0, prev - 1));
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [holdSeconds, autoCycle, onNextArtwork]);
+    return () => clearTimeout(timer);
+  }, [secondsRemaining, autoCycle, onNextArtwork]);
 
   const title = mode === 'bubble' ? '🎉 POP MASTERPIECE COMPLETE 🎉' : '✨ MASTERPIECE COMPLETE ✨';
 

@@ -3,7 +3,7 @@
  * Cozy, magical interactive visual art experience for streaming and ambient relaxation.
  */
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { ArtMode, Artwork, CanvasArtProgress, StudioConfig } from './types';
 import { defaultArtworks } from './services/artworkLibrary';
 import { soundEngine } from './services/audioEngine';
@@ -24,6 +24,9 @@ export default function App() {
   const initialStreamOnly = urlParams.get('mode') === 'stream';
 
   const [artworks, setArtworks] = useState<Artwork[]>(defaultArtworks);
+  const artworksRef = useRef(artworks);
+  artworksRef.current = artworks;
+
   const [currentArtworkIndex, setCurrentArtworkIndex] = useState(0);
 
   const [config, setConfig] = useState<StudioConfig>({
@@ -105,11 +108,9 @@ export default function App() {
       isCompleted: false,
     });
 
-    setArtworks((currentList) => {
-      if (currentList.length <= 1) return currentList;
-      setCurrentArtworkIndex((prevIndex) => getNextIndex(currentList, prevIndex));
-      return currentList;
-    });
+    const currentList = artworksRef.current;
+    if (currentList.length <= 1) return;
+    setCurrentArtworkIndex((prevIndex) => getNextIndex(currentList, prevIndex));
   }, [getNextIndex]);
 
   // Go to previous artwork
@@ -122,11 +123,9 @@ export default function App() {
       isCompleted: false,
     });
 
-    setArtworks((currentList) => {
-      if (currentList.length <= 1) return currentList;
-      setCurrentArtworkIndex((prevIndex) => (prevIndex - 1 + currentList.length) % currentList.length);
-      return currentList;
-    });
+    const currentList = artworksRef.current;
+    if (currentList.length <= 1) return;
+    setCurrentArtworkIndex((prevIndex) => (prevIndex - 1 + currentList.length) % currentList.length);
   }, []);
 
   // Jump directly to specific artwork by index
@@ -144,10 +143,16 @@ export default function App() {
   // Shuffle to random artwork avoiding same category
   const handleShuffleArtwork = useCallback(() => {
     setIsCelebrating(false);
-    if (artworks.length <= 1) return;
-    const nextIdx = getNextIndex(artworks, currentArtworkIndex);
-    setCurrentArtworkIndex(nextIdx);
-  }, [artworks, currentArtworkIndex, getNextIndex]);
+    setProgress({
+      placedCount: 0,
+      totalCount: 1,
+      percentage: 0,
+      isCompleted: false,
+    });
+    const currentList = artworksRef.current;
+    if (currentList.length <= 1) return;
+    setCurrentArtworkIndex((prevIndex) => getNextIndex(currentList, prevIndex));
+  }, [getNextIndex]);
 
   // Restart current artwork
   const handleRestartArtwork = useCallback(() => {
