@@ -1,0 +1,6 @@
+{
+  "name": "Shyfoxie's Dream Studio",
+  "description": "A cozy, magical interactive visual art experience featuring continuous Diamond Painting, Falling Sand, and Bubble Pop Art for ambient streaming and relaxation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
